@@ -1,24 +1,38 @@
 #!/usr/bin/env python
 import re
+inicio = ''
+final = ''
 
 # Abro el archivo de Log.
 file = open('/home/agustin/proyectos/pc/python.txt')
-tInvariantes = file.read()
+stringCompleto = file.read()
 file.close()
 
 # Reemplazo los saltos de línea porque son problemáticos para las regEx.
-tInvariantes = tInvariantes.replace('\n', ',')
+stringCompleto = stringCompleto.replace('\n', ',')
+# print(stringCompleto)
 
 # Armo las regExs
-unInvarianteCualquiera = re.compile(r'T2,|T5,|T7,|T8,|T13,|T15,')
-otroInvarianteCualquiera = re.compile(r'T1,|T4,|T7,|T8,|T13,|T15,')
+invariante = re.compile(r'(T1,(?:T\d(?:\d)?,)*?T4,)?')
 
-# Muestro los valores
-print(list(dict.fromkeys(unInvarianteCualquiera.findall(tInvariantes))))    # sale ordenado.
-print(list(dict.fromkeys(otroInvarianteCualquiera.findall(tInvariantes))))  # sale desordenado.
+# lista = invariante.findall(stringCompleto)
 
-# Saco un invariante
+# uso un ¿iterator? en vez de findall para obtener todos los objetos de match y poder
+# usar las propiedades start, end y group
+for m in invariante.finditer(stringCompleto):
+    if m.group(0) != '':
+        print('%02d-%02d: %s' % (m.start(), m.end(), m.group(0)))
+        inicio = m.start()
+        final = m.end()
+        break  # sacar para ver todos los matches
 
-# print(unInvarianteCualquiera.findall(tInvariantes))
-print(unInvarianteCualquiera.sub('', tInvariantes))
+# Saco un invariante, aca vamos a tener problema con las de dos cifras.
+nuevoString = stringCompleto[:inicio] + stringCompleto[inicio + 3:final - 3] + stringCompleto[final:]
+print(stringCompleto)
+print(nuevoString)
 
+# La última transición que borré está en final.
+
+# una vez que match, borrar las transiciones especificadas, no la fruta del medio.
+# después para el segmento de invariante siguiente, hay que buscar a partir de donde estaba la
+# ultima transición que borre.

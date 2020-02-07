@@ -1,37 +1,37 @@
 #!/usr/bin/env python
 import re
-inicio = ''
-final = ''
 
 # Abro el archivo de Log.
-file = open('/home/agustin/proyectos/pc/python.txt')
+file = open('/home/agustin/proyectos/pc/python2.txt')
 stringCompleto = file.read()
 file.close()
 
 # Reemplazo los saltos de línea porque son problemáticos para las regEx.
 stringCompleto = stringCompleto.replace('\n', ',')
-# print(stringCompleto)
 
 # Armo las regExs
-invariante = re.compile(r'(T1,(?:T\d(?:\d)?,)*?T4,)?')
+invariante = re.compile(
+    r'(?:(?:(?:(T1,)(?:T\d(?:\d)?,)*?(T4,)(?:T\d(?:\d)?,)*?)|(?:(T2,)(?:T\d(?:\d)?,)*?(T5,)(?:T\d(?:\d)?,)*?)|(?:(T3,'
+    r')(?:T\d(?:\d)?,)*?(T6,)(?:T\d(?:\d)?,)*?))(?:(?:(T7,)(?:T\d(?:\d)?,)*?(T8,)(?:T\d(?:\d)?,)*?)|(?:(T9,'
+    r')(?:T\d(?:\d)?,)*?(T10,)(?:T\d(?:\d)?,)*?(T11,)(?:T\d(?:\d)?,)*?(T12,)(?:T\d(?:\d)?,)*?))(?:(?:(T13,'
+    r')(?:T\d(?:\d)?,)*?(T15,))|(?:(T14,)(?:T\d(?:\d)?,)*?(T16,))))', re.MULTILINE)
 
-# lista = invariante.findall(stringCompleto)
+matches = invariante.search(stringCompleto)
 
-# uso un ¿iterator? en vez de findall para obtener todos los objetos de match y poder
-# usar las propiedades start, end y group
-for m in invariante.finditer(stringCompleto):
-    if m.group(0) != '':
-        print('%02d-%02d: %s' % (m.start(), m.end(), m.group(0)))
-        inicio = m.start()
-        final = m.end()
-        break  # sacar para ver todos los matches
-
-# Saco un invariante, aca vamos a tener problema con las de dos cifras.
-nuevoString = stringCompleto[:inicio] + stringCompleto[inicio + 3:final - 3] + stringCompleto[final:]
 print(stringCompleto)
-print(nuevoString)
 
-# La última transición que borré está en final.
+if matches:
+    for groupNum in range(0, len(matches.groups())):
+        groupNum = groupNum + 1
+        if matches.group(groupNum) is not None:
+            print('Grupo: ' + str(groupNum) + ' ' + 'Sale: ' + matches.group(groupNum))
+            stringCompleto = re.sub(matches.group(groupNum), r"", stringCompleto, 1)
+            print(stringCompleto)
+
+print('********************************************************************')
+print(stringCompleto)
+print('********************************************************************')
+
 
 # una vez que match, borrar las transiciones especificadas, no la fruta del medio.
 # después para el segmento de invariante siguiente, hay que buscar a partir de donde estaba la
